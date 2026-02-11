@@ -111,7 +111,7 @@ class QuestionnaireEngine:
             q_text = m.group(2).strip()
             q_type = m.group(3).strip()
             raw_opts = m.group(4)
-            options = [o.strip() for o in raw_opts.split(",")] if raw_opts else []
+            options = [o.strip() for o in raw_opts.split(".") if o.strip()] if raw_opts else []
             q = Question(id=q_id, text=q_text, q_type=q_type, options=options)
             self.questions[q_id] = q
             self.question_order.append(q_id)
