@@ -8,11 +8,16 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 def tariff_keyboard() -> InlineKeyboardMarkup:
+    from config.settings import settings
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💚 Базовый — 8 000 ₽", callback_data="tariff:basic")],
-        [InlineKeyboardButton(text="💎 Сопровождение — 20 000 ₽", callback_data="tariff:extended")],
-        [InlineKeyboardButton(text="🔄 Повторная — 5 000 ₽", callback_data="tariff:repeat")],
-        [InlineKeyboardButton(text="🌿 Лайт — 3 000 ₽", callback_data="tariff:lite")],
+        [InlineKeyboardButton(
+            text="📜 Мои сертификаты и диплом",
+            url="https://telegra.ph/Moi-sertifikaty-i-diplom-02-11",
+        )],
+        [InlineKeyboardButton(text=f"🌿 Экспресс — {settings.TARIFF_LITE_PRICE:,} ₽".replace(",", " "), callback_data="tariff:lite")],
+        [InlineKeyboardButton(text=f"💚 Первичная — {settings.TARIFF_BASIC_PRICE:,} ₽".replace(",", " "), callback_data="tariff:basic")],
+        [InlineKeyboardButton(text=f"🔄 Повторная — {settings.TARIFF_REPEAT_PRICE:,} ₽".replace(",", " "), callback_data="tariff:repeat")],
+        [InlineKeyboardButton(text=f"💎 Сопровождение — {settings.TARIFF_EXTENDED_PRICE:,} ₽".replace(",", " "), callback_data="tariff:extended")],
     ])
 
 

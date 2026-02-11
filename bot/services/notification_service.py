@@ -33,7 +33,7 @@ class NotificationService:
 
         text_parts = [
             "📋 <b>Новая запись на консультацию</b>\n",
-            f"👤 {user.first_name} {user.last_name}",
+            f'👤 <a href="tg://user?id={user.telegram_id}">{user.first_name} {user.last_name}</a>',
             f"🎂 Возраст: {user.age}",
         ]
         if user.weight:
