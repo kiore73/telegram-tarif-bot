@@ -70,3 +70,20 @@ class SlotService:
         )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
+
+    async def get_slots_for_date(self, date) -> List[Slot]:
+        """Get all non-deleted slots for a specific date."""
+        from datetime import time as dt_time
+        day_start = datetime.combine(date, dt_time.min)
+        day_end = datetime.combine(date, dt_time.max)
+        stmt = (
+            select(Slot)
+            .where(
+                Slot.is_deleted.is_(False),
+                Slot.datetime_utc >= day_start,
+                Slot.datetime_utc <= day_end,
+            )
+            .order_by(Slot.datetime_utc)
+        )
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())

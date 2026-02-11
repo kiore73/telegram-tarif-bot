@@ -111,3 +111,88 @@ def admin_slot_delete_keyboard(slots) -> InlineKeyboardMarkup:
         )
     buttons.append([InlineKeyboardButton(text="⬅️ Назад", callback_data="admin:menu")])
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def calendar_keyboard(year: int, month: int) -> InlineKeyboardMarkup:
+    """Inline calendar for a given month — looks like a real calendar grid."""
+    import calendar
+
+    MONTH_NAMES = [
+        "", "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December",
+    ]
+
+    buttons = []
+
+    # Month/year header with < > navigation
+    prev_month = month - 1
+    prev_year = year
+    if prev_month < 1:
+        prev_month = 12
+        prev_year -= 1
+    next_month = month + 1
+    next_year = year
+    if next_month > 12:
+        next_month = 1
+        next_year += 1
+
+    buttons.append([
+        InlineKeyboardButton(text="<", callback_data=f"cal:{prev_year}:{prev_month}"),
+        InlineKeyboardButton(text=f"{MONTH_NAMES[month]} {year}", callback_data="cal:ignore"),
+        InlineKeyboardButton(text=">", callback_data=f"cal:{next_year}:{next_month}"),
+    ])
+
+    # Day-of-week headers
+    buttons.append([
+        InlineKeyboardButton(text=d, callback_data="cal:ignore")
+        for d in ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+    ])
+
+    # Day cells
+    cal = calendar.monthcalendar(year, month)
+    for week in cal:
+        row = []
+        for day in week:
+            if day == 0:
+                row.append(InlineKeyboardButton(text=" ", callback_data="cal:ignore"))
+            else:
+                row.append(InlineKeyboardButton(
+                    text=str(day),
+                    callback_data=f"cal_day:{year}:{month}:{day}",
+                ))
+        buttons.append(row)
+
+    # Back to admin
+    buttons.append([InlineKeyboardButton(text="⬅️ Назад", callback_data="admin:menu")])
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def time_grid_keyboard(
+    date_str: str,
+    taken_hours: set[int] | None = None,
+) -> InlineKeyboardMarkup:
+    """Time selection grid from 09:00 to 18:00. Taken hours marked with ❌."""
+    taken_hours = taken_hours or set()
+
+    hours = list(range(9, 19))  # 09:00 .. 18:00
+    buttons = []
+    row = []
+    for h in hours:
+        label = f"{h:02d}:00"
+        if h in taken_hours:
+            label = f"❌ {label}"
+            cb = "cal:ignore"
+        else:
+            cb = f"cal_time:{date_str}:{h}"
+        row.append(InlineKeyboardButton(text=label, callback_data=cb))
+        if len(row) == 3:
+            buttons.append(row)
+            row = []
+    if row:
+        buttons.append(row)
+
+    buttons.append([InlineKeyboardButton(text="⬅️ Назад к выбору даты", callback_data="admin:create_slot")])
+    buttons.append([InlineKeyboardButton(text="⬅️ Назад в админку", callback_data="admin:menu")])
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)

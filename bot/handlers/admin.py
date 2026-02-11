@@ -1,6 +1,6 @@
-"""Admin panel handler."""
+"""Admin panel handler — calendar-based slot management."""
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date as dt_date
 
 from aiogram import Router, F
 from aiogram.filters import Command
@@ -16,6 +16,8 @@ from config.settings import settings
 from db.models import Booking, User
 
 router = Router()
+
+DEFAULT_SLOT_DURATION = 60  # minutes
 
 
 def _is_admin(user_id: int) -> bool:
@@ -42,77 +44,117 @@ async def admin_menu(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-# --- Create slot flow ---
+# ═══════════════════════════════════════════════════
+#  CREATE SLOT — Calendar → Time Grid → Auto-create
+# ═══════════════════════════════════════════════════
 
 @router.callback_query(F.data == "admin:create_slot")
 async def start_create_slot(callback: CallbackQuery, state: FSMContext):
+    """Show inline calendar for current month."""
     if not _is_admin(callback.from_user.id):
         return
+    now = datetime.now()
     await state.set_state(AdminFSM.entering_slot_date)
-    await callback.message.edit_text(texts.ADMIN_ENTER_DATE, parse_mode="HTML")
+    await callback.message.edit_text(
+        "Выберите дату для добавления слота:",
+        reply_markup=keyboards.calendar_keyboard(now.year, now.month),
+    )
     await callback.answer()
 
 
-@router.message(AdminFSM.entering_slot_date)
-async def enter_slot_date(message: Message, state: FSMContext):
-    try:
-        date = datetime.strptime(message.text.strip(), "%Y-%m-%d").date()
-    except (ValueError, AttributeError):
-        await message.answer(texts.ADMIN_INVALID_DATE, parse_mode="HTML")
+# Calendar navigation (< and >)
+@router.callback_query(F.data.startswith("cal:"), AdminFSM.entering_slot_date)
+async def calendar_nav(callback: CallbackQuery, state: FSMContext):
+    parts = callback.data.split(":")
+    if len(parts) < 3 or parts[1] == "ignore":
+        await callback.answer()
         return
-    await state.update_data(slot_date=str(date))
-    await state.set_state(AdminFSM.entering_slot_time)
-    await message.answer(texts.ADMIN_ENTER_TIME, parse_mode="HTML")
-
-
-@router.message(AdminFSM.entering_slot_time)
-async def enter_slot_time(message: Message, state: FSMContext):
-    try:
-        time = datetime.strptime(message.text.strip(), "%H:%M").time()
-    except (ValueError, AttributeError):
-        await message.answer(texts.ADMIN_INVALID_TIME, parse_mode="HTML")
-        return
-    await state.update_data(slot_time=str(time))
-    await state.set_state(AdminFSM.entering_slot_duration)
-    await message.answer(texts.ADMIN_ENTER_DURATION, parse_mode="HTML")
-
-
-@router.message(AdminFSM.entering_slot_duration)
-async def enter_slot_duration(message: Message, state: FSMContext, session: AsyncSession):
-    try:
-        duration = int(message.text.strip())
-        if not 30 <= duration <= 60:
-            raise ValueError
-    except (ValueError, TypeError, AttributeError):
-        await message.answer(texts.ADMIN_INVALID_DURATION, parse_mode="HTML")
-        return
-
-    data = await state.get_data()
-    date = datetime.strptime(data["slot_date"], "%Y-%m-%d").date()
-    time = datetime.strptime(data["slot_time"], "%H:%M:%S").time()
-    dt = datetime.combine(date, time)
-
-    # Check not in past (UTC)
-    if dt < datetime.now(timezone.utc).replace(tzinfo=None):
-        await message.answer(texts.ADMIN_PAST_SLOT, parse_mode="HTML")
-        return
-
-    slot_svc = SlotService(session)
-    slot = await slot_svc.create_slot(dt, duration, message.from_user.id)
-
-    await message.answer(
-        texts.ADMIN_SLOT_CREATED.format(
-            date=date.strftime("%d.%m.%Y"),
-            time=time.strftime("%H:%M"),
-            duration=duration,
-        ),
-        parse_mode="HTML",
+    year, month = int(parts[1]), int(parts[2])
+    await callback.message.edit_text(
+        "Выберите дату для добавления слота:",
+        reply_markup=keyboards.calendar_keyboard(year, month),
     )
-    await state.set_state(AdminFSM.main_menu)
-    await message.answer(texts.ADMIN_MENU, parse_mode="HTML", reply_markup=keyboards.admin_menu_keyboard())
+    await callback.answer()
 
 
-# --- Delete slot ---
+# Day selected → show time grid
+@router.callback_query(F.data.startswith("cal_day:"), AdminFSM.entering_slot_date)
+async def on_day_selected(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
+    _, year, month, day = callback.data.split(":")
+    year, month, day = int(year), int(month), int(day)
+    selected_date = dt_date(year, month, day)
+
+    # Check not in the past
+    today = datetime.now().date()
+    if selected_date < today:
+        await callback.answer("❌ Нельзя выбрать прошедшую дату", show_alert=True)
+        return
+
+    # Find existing slots for this date to mark taken hours
+    slot_svc = SlotService(session)
+    existing_slots = await slot_svc.get_slots_for_date(selected_date)
+    taken_hours = {s.datetime_utc.hour for s in existing_slots}
+
+    date_str = selected_date.strftime("%Y-%m-%d")
+    await state.update_data(slot_date=date_str)
+    await state.set_state(AdminFSM.entering_slot_time)
+
+    # Format the date nicely for the header
+    display_date = selected_date.strftime("%d %B %Y")
+    await callback.message.edit_text(
+        f"Выбрана дата: <b>{display_date}</b>. Теперь выберите время:",
+        parse_mode="HTML",
+        reply_markup=keyboards.time_grid_keyboard(date_str, taken_hours),
+    )
+    await callback.answer()
+
+
+# Time selected → create slot immediately
+@router.callback_query(F.data.startswith("cal_time:"), AdminFSM.entering_slot_time)
+async def on_time_selected(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
+    parts = callback.data.split(":")
+    date_str = parts[1]
+    hour = int(parts[2])
+
+    selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    from datetime import time as dt_time
+    dt = datetime.combine(selected_date, dt_time(hour, 0))
+
+    # Check not in past
+    if dt < datetime.now():
+        await callback.answer("❌ Это время уже прошло", show_alert=True)
+        return
+
+    # Create slot
+    slot_svc = SlotService(session)
+    slot = await slot_svc.create_slot(dt, DEFAULT_SLOT_DURATION, callback.from_user.id)
+
+    await callback.answer(
+        f"✅ Слот создан: {selected_date.strftime('%d.%m.%Y')} {hour:02d}:00 ({DEFAULT_SLOT_DURATION} мин)",
+        show_alert=True,
+    )
+
+    # Refresh time grid — show updated taken hours
+    existing_slots = await slot_svc.get_slots_for_date(selected_date)
+    taken_hours = {s.datetime_utc.hour for s in existing_slots}
+
+    display_date = selected_date.strftime("%d %B %Y")
+    await callback.message.edit_text(
+        f"Выбрана дата: <b>{display_date}</b>. Теперь выберите время:",
+        parse_mode="HTML",
+        reply_markup=keyboards.time_grid_keyboard(date_str, taken_hours),
+    )
+
+
+# Ignore clicks on empty/header cells
+@router.callback_query(F.data == "cal:ignore")
+async def ignore_calendar_click(callback: CallbackQuery):
+    await callback.answer()
+
+
+# ═══════════════════════════════════════════════════
+#  DELETE SLOT
+# ═══════════════════════════════════════════════════
 
 @router.callback_query(F.data == "admin:delete_slot")
 async def start_delete_slot(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
@@ -145,7 +187,9 @@ async def confirm_delete_slot(callback: CallbackQuery, state: FSMContext, sessio
     await start_delete_slot(callback, state, session)
 
 
-# --- List slots ---
+# ═══════════════════════════════════════════════════
+#  LIST SLOTS
+# ═══════════════════════════════════════════════════
 
 @router.callback_query(F.data == "admin:list_slots")
 async def list_slots(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
@@ -163,7 +207,9 @@ async def list_slots(callback: CallbackQuery, state: FSMContext, session: AsyncS
     await callback.answer()
 
 
-# --- History ---
+# ═══════════════════════════════════════════════════
+#  BOOKING HISTORY
+# ═══════════════════════════════════════════════════
 
 @router.callback_query(F.data == "admin:history")
 async def booking_history(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
