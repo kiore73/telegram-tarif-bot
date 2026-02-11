@@ -39,8 +39,13 @@ async def main():
     dp = Dispatcher(storage=MemoryStorage())
 
     # Middlewares
+    # Middlewares
     dp.message.middleware(DbSessionMiddleware())
     dp.callback_query.middleware(DbSessionMiddleware())
+
+    # Album middleware
+    from bot.middlewares.album import AlbumMiddleware
+    dp.message.middleware(AlbumMiddleware())
 
     # Routers
     dp.include_router(admin.router)    # admin first (higher priority)

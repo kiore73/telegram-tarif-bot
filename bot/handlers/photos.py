@@ -24,44 +24,59 @@ MAX_PHOTOS = 20
 
 
 @router.message(BookingFSM.uploading_photos, F.photo)
-async def on_photo(message: Message, state: FSMContext, session: AsyncSession):
+async def on_photo(message: Message, state: FSMContext, session: AsyncSession, album: list[Message] | None = None):
     data = await state.get_data()
     user_db_id = data.get("user_db_id", 0)
     photo_count = data.get("photo_count", 0)
     saved_photos: list = data.get("saved_photos", [])
 
-    if photo_count >= MAX_PHOTOS:
-        await message.answer(texts.PHOTO_LIMIT, parse_mode="HTML")
-        return
+    # If album middleware collected messages, 'album' arg will be populated
+    # Otherwise, it's a single message, so we wrap it in a list
+    messages = album if album else [message]
 
-    # Get the largest photo
-    photo = message.photo[-1]
+    new_photos_count = 0
 
-    # Download file to disk
-    bot = message.bot
-    file = await bot.get_file(photo.file_id)
-    file_data = await bot.download_file(file.file_path)
+    for msg in messages:
+        if photo_count >= MAX_PHOTOS:
+            break
+        
+        if not msg.photo:
+            continue
 
-    filename = f"photo_{photo_count + 1}.jpg"
-    folder = Path(settings.UPLOAD_DIR) / str(user_db_id) / "pending"
-    folder.mkdir(parents=True, exist_ok=True)
-    file_path = folder / filename
+        # Get the largest photo
+        photo = msg.photo[-1]
 
-    async with aiofiles.open(file_path, "wb") as f:
-        await f.write(file_data.read())
+        # Download file to disk
+        bot = msg.bot
+        file = await bot.get_file(photo.file_id)
+        file_data = await bot.download_file(file.file_path)
 
-    # Track in FSM state (NOT in DB yet)
-    saved_photos.append({
-        "file_path": str(file_path),
-        "telegram_file_id": photo.file_id,
-    })
+        filename = f"photo_{photo_count + 1}.jpg"
+        folder = Path(settings.UPLOAD_DIR) / str(user_db_id) / "pending"
+        folder.mkdir(parents=True, exist_ok=True)
+        file_path = folder / filename
 
-    photo_count += 1
+        async with aiofiles.open(file_path, "wb") as f:
+            await f.write(file_data.read())
+
+        # Track in FSM state
+        saved_photos.append({
+            "file_path": str(file_path),
+            "telegram_file_id": photo.file_id,
+        })
+        photo_count += 1
+        new_photos_count += 1
+
     await state.update_data(photo_count=photo_count, saved_photos=saved_photos)
-    await message.answer(
-        texts.PHOTO_RECEIVED.format(num=photo_count),
-        reply_markup=keyboards.photos_keyboard(),
-    )
+    
+    # Send only one confirmation message
+    if new_photos_count > 0:
+        await message.answer(
+            texts.PHOTO_RECEIVED.format(num=photo_count),
+            reply_markup=keyboards.photos_keyboard(),
+        )
+    elif photo_count >= MAX_PHOTOS:
+        await message.answer(texts.PHOTO_LIMIT, parse_mode="HTML")
 
 
 @router.callback_query(F.data == "photos_done", BookingFSM.uploading_photos)
