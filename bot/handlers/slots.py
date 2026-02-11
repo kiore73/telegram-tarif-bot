@@ -94,6 +94,18 @@ async def on_confirm(callback: CallbackQuery, state: FSMContext, session: AsyncS
 
     await session.commit()
 
+    # Save photos to DB now that booking exists
+    saved_photos = data.get("saved_photos", [])
+    for p in saved_photos:
+        photo_record = Photo(
+            booking_id=booking.id,
+            file_path=p["file_path"],
+            telegram_file_id=p.get("telegram_file_id"),
+        )
+        session.add(photo_record)
+    if saved_photos:
+        await session.commit()
+
     # Load answers and photos for notification
     user = await session.get(User, user_db_id)
     answers_result = await session.execute(
