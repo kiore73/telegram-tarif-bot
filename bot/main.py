@@ -24,6 +24,13 @@ logger = logging.getLogger(__name__)
 
 
 async def main():
+    # Auto-create database tables if they don't exist
+    from db.base import engine, Base
+    from db import models  # noqa: F401 — register all models
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    logger.info("Database tables ensured")
+
     bot = Bot(
         token=settings.BOT_TOKEN,
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
