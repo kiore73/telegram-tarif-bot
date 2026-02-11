@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     TARIFF_REPEAT_PRICE: int = 5000
     TARIFF_LITE_PRICE: int = 3000
 
+    # Webhook
+    WEBHOOK_PORT: int = 8080
+    YOOKASSA_WEBHOOK_SECRET: str = ""
+
     # Other
     TIMEZONE: str = "Europe/Moscow"
     UPLOAD_DIR: str = "./uploads"

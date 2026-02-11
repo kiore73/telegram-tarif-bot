@@ -87,11 +87,68 @@ TARIFF_LITE_PRICE=3000
 TIMEZONE=Europe/Moscow
 UPLOAD_DIR=./uploads
 PHOTO_RETENTION_DAYS=30
+
+# === ВЕБХУК ЮKassa (автоматическое подтверждение оплаты) ===
+WEBHOOK_PORT=8080
+YOOKASSA_WEBHOOK_SECRET=your_webhook_secret
 ```
 
 > ⚠️ **Важно**: `YOOKASSA_RETURN_URL` должен быть ссылкой на вашего бота (`https://t.me/имя_бота`), чтобы после оплаты пользователь вернулся в чат.
 
-### Шаг 5. Запуск через Docker Compose
+### Шаг 5. Настройка вебхуков ЮKassa (SSL + домен)
+
+Для автоматического подтверждения оплаты ЮKassa отправляет POST-запросы на ваш сервер. Для этого **нужен домен с SSL-сертификатом**.
+
+#### 5.1. Получение домена
+
+Привяжите домен (например, `bot.yourdomain.ru`) к IP-адресу вашего сервера через A-запись в DNS.
+
+#### 5.2. Установка Nginx + Let's Encrypt
+
+```bash
+# Установка Nginx и Certbot
+sudo apt update
+sudo apt install -y nginx certbot python3-certbot-nginx
+
+# Создание конфига Nginx
+sudo nano /etc/nginx/sites-available/tarif-bot
+```
+
+Содержимое файла:
+```nginx
+server {
+    listen 80;
+    server_name bot.yourdomain.ru;
+
+    location /webhook/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+```bash
+# Активация конфига
+sudo ln -s /etc/nginx/sites-available/tarif-bot /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+
+# Получение SSL-сертификата (бесплатно)
+sudo certbot --nginx -d bot.yourdomain.ru
+```
+
+#### 5.3. Настройка URL в ЮKassa
+
+1. Откройте [Личный кабинет ЮKassa](https://yookassa.ru/my) → **Настройки** → **HTTP-уведомления**
+2. Укажите URL: `https://bot.yourdomain.ru/webhook/yookassa`
+3. Включите события: **payment.succeeded**, **payment.canceled**
+4. Сохраните
+
+
+### Шаг 6. Запуск через Docker Compose
 
 ```bash
 # Собрать и запустить контейнеры (бот + PostgreSQL)
@@ -108,7 +165,7 @@ telegram-tarif-bot-bot-1       Up
 telegram-tarif-bot-postgres-1  Up
 ```
 
-### Шаг 6. Инициализация базы данных
+### Шаг 7. Инициализация базы данных
 
 ```bash
 # Создать миграцию (первый раз)
@@ -118,7 +175,7 @@ docker-compose exec bot alembic revision --autogenerate -m "initial"
 docker-compose exec bot alembic upgrade head
 ```
 
-### Шаг 7. Проверка работы
+### Шаг 8. Проверка работы
 
 1. Откройте вашего бота в Telegram
 2. Отправьте `/start` — должно появиться приветствие с выбором тарифов

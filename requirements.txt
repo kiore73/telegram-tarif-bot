@@ -5,3 +5,4 @@ alembic
 pydantic-settings
 yookassa>=3.0
 aiofiles
+aiohttp
