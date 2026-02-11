@@ -92,8 +92,13 @@ async def on_tariff_selected(callback: CallbackQuery, state: FSMContext, session
     await state.set_state(BookingFSM.awaiting_payment)
 
     tariff_text = texts.TARIFF_SELECTED.format(tariff=tariff_label, price=f"{price:,}".replace(",", " "))
+    consent_text = (
+        '⚠️ Нажимая кнопку «Оплатить», я подтверждаю, что ознакомлен(а) '
+        'и согласен(на) с <b>Договором-офертой</b> и <b>Согласием на обработку '
+        'моих персональных данных</b>, включая данные о здоровье и пищевых привычках.'
+    )
     await callback.message.edit_text(
-        f"{tariff_text}\n\n{texts.PAYMENT_CHECK}",
+        f"{tariff_text}\n\n{consent_text}\n\n{texts.PAYMENT_CHECK}",
         parse_mode="HTML",
         reply_markup=keyboards.payment_check_keyboard(yk_result["confirmation_url"]),
     )

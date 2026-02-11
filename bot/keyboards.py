@@ -20,6 +20,14 @@ def payment_check_keyboard(payment_url: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="💳 Оплатить", url=payment_url)],
         [InlineKeyboardButton(text="✅ Проверить оплату", callback_data="check_payment")],
+        [InlineKeyboardButton(
+            text="📄 Договор-оферта",
+            url="https://telegra.ph/Dogovor-oferta-na-okazanie-uslug-nutriciologii-02-11",
+        )],
+        [InlineKeyboardButton(
+            text="🔒 Согласие на обработку персональных данных",
+            url="https://telegra.ph/SOGLASIE-NA-OBRABOTKU-PERSONALNYH-DANNYH-02-11-19",
+        )],
     ])
 
 
