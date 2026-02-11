@@ -64,6 +64,14 @@ async def main():
     await site.start()
     logger.info(f"YooKassa webhook server started on port {webhook_port}")
 
+    # Register bot menu commands
+    from aiogram.types import BotCommand
+    await bot.set_my_commands([
+        BotCommand(command="start", description="🌿 Начать / выбрать консультацию"),
+        BotCommand(command="admin", description="🔧 Панель администратора"),
+    ])
+    logger.info("Bot commands registered")
+
     # Start bot polling
     logger.info("Bot starting...")
     try:
