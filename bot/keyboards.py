@@ -31,7 +31,10 @@ def gender_keyboard() -> InlineKeyboardMarkup:
 
 
 def single_option_keyboard(options: List[str], prefix: str = "answer") -> InlineKeyboardMarkup:
-    buttons = [[InlineKeyboardButton(text=opt, callback_data=f"{prefix}:{opt[:60]}")] for opt in options]
+    buttons = [
+        [InlineKeyboardButton(text=opt, callback_data=f"{prefix}:{i}")]
+        for i, opt in enumerate(options)
+    ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
@@ -42,10 +45,10 @@ def multi_option_keyboard(
 ) -> InlineKeyboardMarkup:
     selected = selected or set()
     buttons = []
-    for opt in options:
+    for i, opt in enumerate(options):
         mark = "☑" if opt in selected else "☐"
         buttons.append(
-            [InlineKeyboardButton(text=f"{mark} {opt}", callback_data=f"{prefix}:{opt[:55]}")]
+            [InlineKeyboardButton(text=f"{mark} {opt}", callback_data=f"{prefix}:{i}")]
         )
     buttons.append([InlineKeyboardButton(text="✅ Готово", callback_data="multi_done")])
     return InlineKeyboardMarkup(inline_keyboard=buttons)

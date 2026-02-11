@@ -79,9 +79,13 @@ async def send_question(target: Message | CallbackQuery, state: FSMContext) -> N
 # --- Single answer ---
 @router.callback_query(F.data.startswith("answer:"), BookingFSM.answering_questionnaire)
 async def on_single_answer(callback: CallbackQuery, state: FSMContext):
-    answer_value = callback.data.split(":", 1)[1]
+    idx = int(callback.data.split(":", 1)[1])
     data = await state.get_data()
     q_id = data.get("current_question_id")
+    phase = data.get("questionnaire_phase", "basic")
+    engine = _get_engine(QUESTIONNAIRE_MAP[phase])
+    q = engine.questions.get(q_id)
+    answer_value = q.options[idx] if q and idx < len(q.options) else str(idx)
 
     answers = data.get("questionnaire_answers", {})
     answers[q_id] = answer_value
@@ -94,8 +98,14 @@ async def on_single_answer(callback: CallbackQuery, state: FSMContext):
 # --- Multi answer ---
 @router.callback_query(F.data.startswith("multi:"), BookingFSM.answering_questionnaire)
 async def on_multi_toggle(callback: CallbackQuery, state: FSMContext):
-    option = callback.data.split(":", 1)[1]
+    idx = int(callback.data.split(":", 1)[1])
     data = await state.get_data()
+    q_id = data.get("current_question_id")
+    phase = data.get("questionnaire_phase", "basic")
+    engine = _get_engine(QUESTIONNAIRE_MAP[phase])
+    q = engine.questions.get(q_id)
+    option = q.options[idx] if q and idx < len(q.options) else str(idx)
+
     selected = set(data.get("multi_selected", []))
     if option in selected:
         selected.discard(option)
