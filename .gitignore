@@ -11,6 +11,10 @@ venv/
 # IDE
 .idea/
 .vscode/
+# Google
+google_credentials.json
+config/*.pickle
+
 # OS
 .DS_Store
 Thumbs.db

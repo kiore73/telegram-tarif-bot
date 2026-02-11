@@ -6,3 +6,6 @@ pydantic-settings
 yookassa>=3.0
 aiofiles
 aiohttp
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib

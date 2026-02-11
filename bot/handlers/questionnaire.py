@@ -67,20 +67,38 @@ async def _show_question(target: Message | CallbackQuery, state: FSMContext, edi
 
     show_back = len(history) > 0
 
-    # Determine whether to edit or send a new message
+    # Function to format options if they are long
+    def format_options(text: str, opts: list[str]) -> tuple[str, list[str] | None]:
+        # Check if any option is long (e.g. > 40 chars)
+        if any(len(o) > 40 for o in opts):
+            # Create numbered list in text
+            new_text = text + "\n"
+            labels = []
+            for i, o in enumerate(opts, 1):
+                new_text += f"\n{i}. {o}"
+                labels.append(str(i))
+            return new_text, labels
+        return text, None
+
     if edit and isinstance(target, CallbackQuery) and target.message:
         msg = target.message
         try:
             if q.q_type == "single":
+                text, labels = format_options(f"❓ {q.text}", q.options)
                 await msg.edit_text(
-                    f"❓ {q.text}",
-                    reply_markup=keyboards.single_option_keyboard(q.options, show_back=show_back),
+                    text,
+                    reply_markup=keyboards.single_option_keyboard(
+                        q.options, show_back=show_back, labels=labels
+                    ),
                 )
             elif q.q_type == "multi":
+                text, labels = format_options(f"❓ {q.text}", q.options)
                 await state.update_data(multi_selected=[])
                 await msg.edit_text(
-                    f"❓ {q.text}\n\n{texts.QUESTIONNAIRE_MULTI_HINT}",
-                    reply_markup=keyboards.multi_option_keyboard(q.options, show_back=show_back),
+                    f"{text}\n\n{texts.QUESTIONNAIRE_MULTI_HINT}",
+                    reply_markup=keyboards.multi_option_keyboard(
+                        q.options, show_back=show_back, labels=labels
+                    ),
                 )
             elif q.q_type == "text":
                 await msg.edit_text(f"❓ {q.text}\n\n{texts.QUESTIONNAIRE_TEXT_HINT}")
@@ -98,15 +116,21 @@ async def _show_question(target: Message | CallbackQuery, state: FSMContext, edi
     msg_target = target if isinstance(target, Message) else target.message
 
     if q.q_type == "single":
+        text, labels = format_options(f"❓ {q.text}", q.options)
         await msg_target.answer(
-            f"❓ {q.text}",
-            reply_markup=keyboards.single_option_keyboard(q.options, show_back=show_back),
+            text,
+            reply_markup=keyboards.single_option_keyboard(
+                q.options, show_back=show_back, labels=labels
+            ),
         )
     elif q.q_type == "multi":
+        text, labels = format_options(f"❓ {q.text}", q.options)
         await state.update_data(multi_selected=[])
         await msg_target.answer(
-            f"❓ {q.text}\n\n{texts.QUESTIONNAIRE_MULTI_HINT}",
-            reply_markup=keyboards.multi_option_keyboard(q.options, show_back=show_back),
+            f"{text}\n\n{texts.QUESTIONNAIRE_MULTI_HINT}",
+            reply_markup=keyboards.multi_option_keyboard(
+                q.options, show_back=show_back, labels=labels
+            ),
         )
     elif q.q_type == "text":
         await msg_target.answer(f"❓ {q.text}\n\n{texts.QUESTIONNAIRE_TEXT_HINT}")

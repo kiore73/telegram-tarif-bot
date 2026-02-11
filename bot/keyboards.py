@@ -43,11 +43,12 @@ def gender_keyboard() -> InlineKeyboardMarkup:
     ])
 
 
-def single_option_keyboard(options: List[str], prefix: str = "answer", show_back: bool = False) -> InlineKeyboardMarkup:
-    buttons = [
-        [InlineKeyboardButton(text=opt, callback_data=f"{prefix}:{i}")]
-        for i, opt in enumerate(options)
-    ]
+def single_option_keyboard(options: List[str], prefix: str = "answer", show_back: bool = False, labels: List[str] | None = None) -> InlineKeyboardMarkup:
+    buttons = []
+    for i, opt in enumerate(options):
+        text = labels[i] if labels and i < len(labels) else opt
+        buttons.append([InlineKeyboardButton(text=text, callback_data=f"{prefix}:{i}")])
+    
     if show_back:
         buttons.append([InlineKeyboardButton(text="⬅️ Назад", callback_data="q_back")])
     return InlineKeyboardMarkup(inline_keyboard=buttons)
@@ -58,13 +59,15 @@ def multi_option_keyboard(
     selected: set[str] | None = None,
     prefix: str = "multi",
     show_back: bool = False,
+    labels: List[str] | None = None,
 ) -> InlineKeyboardMarkup:
     selected = selected or set()
     buttons = []
     for i, opt in enumerate(options):
+        text = labels[i] if labels and i < len(labels) else opt
         mark = "☑" if opt in selected else "☐"
         buttons.append(
-            [InlineKeyboardButton(text=f"{mark} {opt}", callback_data=f"{prefix}:{i}")]
+            [InlineKeyboardButton(text=f"{mark} {text}", callback_data=f"{prefix}:{i}")]
         )
     buttons.append([InlineKeyboardButton(text="✅ Готово", callback_data="multi_done")])
     if show_back:

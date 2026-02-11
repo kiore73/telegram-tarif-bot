@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
-import uuid
+import logging
 from typing import Optional
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.models import Booking, BookingStatus, TariffType
+from db.models import Booking, BookingStatus, TariffType, Slot
+from bot.services.google_meet import GoogleMeetService
+
+logger = logging.getLogger(__name__)
 
 
 class BookingService:
@@ -21,8 +25,33 @@ class BookingService:
         slot_id: int,
         tariff: TariffType,
     ) -> Booking:
-        # Generate a placeholder conference link
-        conference_link = f"https://telemost.yandex.ru/placeholder-{uuid.uuid4().hex[:8]}"
+        # 1. Get slot info for meeting details
+        slot = await self.session.get(Slot, slot_id)
+        if not slot:
+            raise ValueError(f"Slot {slot_id} not found")
+
+        # 2. Try to generate Google Meet link
+        conference_link = None
+        try:
+            meet_service = GoogleMeetService()
+            # Summary: "Consultation - [Tariff]" or similar
+            summary = f"Консультация ({tariff.value})"
+            description = f"Онлайн-консультация. Тариф: {tariff.value}"
+            
+            link_obj = meet_service.create_meeting(
+                summary=summary,
+                description=description,
+                start_time=slot.datetime_utc,
+                duration_minutes=slot.duration_minutes
+            )
+            if link_obj:
+                conference_link = link_obj.url
+        except Exception as e:
+            logger.error(f"Failed to generate Google Meet link: {e}")
+
+        # Fallback if generation failed
+        if not conference_link:
+            conference_link = "Ссылка будет отправлена администратором вручную"
 
         booking = Booking(
             user_id=user_id,
