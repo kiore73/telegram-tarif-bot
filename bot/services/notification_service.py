@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import html
 import logging
 from typing import TYPE_CHECKING
 
@@ -55,7 +56,9 @@ class NotificationService:
         if answers:
             text_parts.append("\n📝 <b>Ответы на опросник:</b>")
             for a in answers:
-                text_parts.append(f"  • {a.question_text}: <i>{a.answer}</i>")
+                q = html.escape(str(a.question_text))
+                ans = html.escape(str(a.answer))
+                text_parts.append(f"  • {q}: <i>{ans}</i>")
 
         message = "\n".join(text_parts)
 
