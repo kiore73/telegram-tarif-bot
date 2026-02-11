@@ -1,0 +1,17 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY bot/ bot/
+COPY db/ db/
+COPY config/ config/
+COPY questionnaires/ questionnaires/
+COPY alembic.ini .
+COPY db/migrations/ db/migrations/
+
+RUN mkdir -p uploads
+
+CMD ["python", "-m", "bot.main"]
