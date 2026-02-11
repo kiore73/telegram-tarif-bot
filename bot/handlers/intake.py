@@ -87,11 +87,12 @@ async def enter_weight(message: Message, state: FSMContext, session: AsyncSessio
             questionnaire_phase="basic",
             questionnaire_index=0,
             questionnaire_answers={},
-            multi_selected=[]
+            multi_selected=[],
+            question_history=[],
         )
         # Import here to avoid circular
-        from bot.handlers.questionnaire import send_question
-        await send_question(message, state)
+        from bot.handlers.questionnaire import _show_question
+        await _show_question(message, state)
 
 
 async def _save_user_data(session: AsyncSession, data: dict, age: int = 0, weight: float = 0):

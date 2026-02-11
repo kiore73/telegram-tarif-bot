@@ -34,11 +34,12 @@ async def on_gender_selected(callback: CallbackQuery, state: FSMContext, session
         current_question_id=None,
         questionnaire_answers={"q_gender": gender},
         multi_selected=[],
+        question_history=[],
     )
     await state.set_state(BookingFSM.answering_questionnaire)
 
     await callback.message.edit_text(f"Пол: <b>{gender}</b>", parse_mode="HTML")
     await callback.answer()
 
-    from bot.handlers.questionnaire import send_question
-    await send_question(callback, state)
+    from bot.handlers.questionnaire import _show_question
+    await _show_question(callback, state)
