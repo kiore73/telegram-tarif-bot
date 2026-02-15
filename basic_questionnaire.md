@@ -1,353 +1,409 @@
 # Basic Questionnaire Specification
 
 ## Overview
-This document specifies the "basic" questionnaire with conditional logic based on flags (anemia, nervous, skin).
+This is the basic questionnaire updated from user inputs.
 
 ## Questions
 
-### 1. `q_gender`
+### q_gender
 *   **Text:** Укажите ваш пол
 *   **Type:** single
 *   **Options:** Мужчина. Женщина
 
-### 2. `q_occupation`
-*   **Text:** Ваш род занятий (можно выбрать несколько вариантов)
+### q_occupation
+*   **Text:** Ваш род занятий, работа (можно выбрать несколько вариантов)
 *   **Type:** multi
-*   **Options:** Сидячая работа. Есть физическая нагрузка. Высокая умственная нагрузка / ответственность. Приходится долго стоять. Частые поездки / перелеты
+*   **Options:** Сидячая. Присутствует физическая нагрузка. Высокая умственная нагрузка / высокий уровень ответственности. Приходится долго стоять. Много разъездов. поездок. перелетов
 
-### 3. `q_sport_activity`
-*   **Text:** Есть ли в вашей жизни спорт или физическая активность?
+### q_sport_activity
+*   **Text:** Присутствуют ли в вашей жизни спорт или физическая активность?
 *   **Type:** single
-*   **Options:** Да, регулярно. Нерегулярно. Нет. Профессиональный спортсмен
+*   **Options:** Да. регулярно. Нерегулярно. время от времени. Нет и не было. Я профессиональный спортсмен
 
-### 4. `q_chronic_diseases`
-*   **Text:** Есть ли у вас хронические или наследственные заболевания? Укажите.
+### q_chronic_diseases
+*   **Text:** Если у вас есть или были хронические или наследственные заболевания, укажите диагнозы
 *   **Type:** text
 
-### 5. `q_family_diseases`
-*   **Text:** Есть ли хронические или генетические заболевания у близких родственников?
+### q_family_diseases
+*   **Text:** Есть ли хронические или генетические заболевания у ваших ближайших биологических родственников?
 *   **Type:** text
 
-### 6. `q_surgeries`
-*   **Text:** Были ли у вас операции? Какие и когда?
+### q_surgeries
+*   **Text:** Были ли у вас операции? Если да, какие и как давно?
 *   **Type:** text
 
-### 7. `q_medications`
-*   **Text:** Принимаете ли вы постоянно лекарства или БАДы? Какие?
+### q_medications
+*   **Text:** Принимаете ли вы на постоянной основе фармацевтические препараты или БАДы? Если да, укажите какие
 *   **Type:** text
 
-### 8. `q_allergy`
+### q_allergy
 *   **Text:** Испытываете ли вы симптомы аллергии?
 *   **Type:** single
 *   **Options:** Очень часто. Иногда. Сезонно. Нет
 
-### 9. `q_orvi`
+### q_orvi
 *   **Text:** Как часто вы переносите сезонные ОРВИ?
 *   **Type:** single
-*   **Options:** Очень редко. 1–2 раза в год. 3–4 раза в год. Постоянно, даже летом
-*   If answer == "3–4 раза в год" set flag_anemia
-*   If answer == "Постоянно, даже летом" set flag_anemia
+*   **Options:** Очень редко. 1–2 раза в год. 3–4 раза в год. Постоянно. даже летом
 
-### 10. `q_daily_routine`
-*   **Text:** Опишите ваш режим дня (сон, питание, работа, транспорт, прогулки).
+### q_daily_routine
+*   **Text:** Опишите кратко ваш режим дня (сон, питание, работа, транспорт, хобби, прогулки)
 *   **Type:** text
 
-### 11. `q_sleep_quality`
-*   **Text:** Оцените качество сна (можно несколько вариантов)
+### q_sleep_quality
+*   **Text:** Оцените качество вашего сна (можно выбрать несколько вариантов)
 *   **Type:** multi
-*   **Options:** Быстро засыпаю. Засыпаю более 40 минут. Сон крепкий без пробуждений. Сон чуткий. Есть трекер сна. Просыпаюсь легко. Просыпаюсь тяжело. Нет сил до обеда
+*   **Options:** Быстро засыпаю. Требуется более 40 минут для засыпания. Сон без пробуждений. Сон чуткий. есть пробуждения. Есть трекер сна. Просыпаюсь легко и чувствую восстановление. Просыпаюсь тяжело. но потом бодр. Тяжело проснуться. нет сил до обеда
 
-### 12. `q_sleep_hygiene`
-*   **Text:** Знакомы ли вы с правилами здорового сна?
+### q_sleep_hygiene
+*   **Text:** Знакомы ли вы с правилами и гигиеной здорового сна?
 *   **Type:** single
-*   **Options:** Да, соблюдаю. Да, но не соблюдаю. Нет
+*   **Options:** Да. стараюсь придерживаться. Да. но не получается соблюдать. Нет. не знаком
 
-### 13. `q_muscle_symptoms`
-*   **Text:** Есть ли судороги, спазмы или онемение?
+### q_muscle_symptoms
+*   **Text:** Наблюдали ли вы у себя мышечные судороги, слабость или онемение?
 *   **Type:** multi
-*   **Options:** Нет. Судороги ног ночью. Спазмы шеи. Регулярные судороги. Онемение конечностей
+*   **Options:** Нет. Судороги ног ночью. Спазмы мышц шеи. Судороги или спазмы регулярно. Онемение конечностей
 
-### 14. `q_dizziness`
+### q_dizziness
 *   **Text:** Испытываете ли вы головокружение?
 *   **Type:** single
-*   **Options:** Да, часто. Иногда. Нет
-*   If answer != "Нет" set flag_anemia
-*   If answer != "Нет" set flag_nervous
+*   **Options:** Да. часто. Иногда. Нет
 
-### 15. `q_pressure`
-*   **Text:** Знаете ли вы свое артериальное давление?
+### q_pressure
+*   **Text:** Знаете ли вы свое артериальное давление и пульс?
 *   **Type:** single
-*   **Options:** Не знаю. Повышенное. Пониженное. Нестабильное. Есть трекер
-*   If answer == "Пониженное" set flag_anemia
-*   If answer == "Нестабильное" set flag_anemia
+*   **Options:** Не знаю. Повышенное / гипертония. Пониженное. Нестабильное. Есть трекер
 
-### 16. `q_edema`
+### q_edema
 *   **Text:** Беспокоят ли вас отеки?
 *   **Type:** multi
-*   **Options:** Нет. Постоянно. Летом. Ноги. Лицо и руки
+*   **Options:** Нет. Постоянно. Летом. отекают ноги/лодыжки. Лицо и руки
 
-### 17. `q_urination`
+### q_urination
 *   **Text:** Бывают ли стрессовые или ночные позывы к мочеиспусканию?
 *   **Type:** single
 *   **Options:** Да. Иногда. Нет
 
-### 18. `q_veins`
-*   **Text:** Беспокоят ли вас варикоз или тяжесть в ногах?
+### q_veins
+*   **Text:** Беспокоят ли вас вены, сосудистые звездочки, варикоз, тяжесть в ногах?
 *   **Type:** single
-*   **Options:** Нет. Иногда. Часто
+*   **Options:** Нет. беспокоит тяжесть. Часто
 
-### 19. `q_water`
+### q_water
 *   **Text:** Оцените ваш питьевой режим
 *   **Type:** multi
-*   **Options:** Пью достаточно воды. Пью по приложению. Воду не люблю. Забываю пить. Не чувствую жажды. Пью много
+*   **Options:** Пью достаточно воды. Воду не люблю. пью другие напитки. Забываю пить. часто жажда. Не чувствую жажды. Пью много. жажда не утоляется
 
-### 20. `q_gut_pain`
-*   **Text:** Есть ли боли или дискомфорт в животе?
+### q_gut_pain
+*   **Text:** Испытываете ли вы болевые ощущения или дискомфорт в животе?
 *   **Type:** multi
-*   **Options:** Верх живота. Область пупка. Низ живота. Справа. Слева. Нет
+*   **Options:** В верхней части живота (эпигастрий). В области пупка. Внизу живота. Больше справа. Больше слева или в области спины. Нет
 
-### 21. `q_gut_pain_relation`
-*   **Text:** Связаны ли боли с приемом пищи?
+### q_gut_pain_relation
+*   **Text:** Если есть боли, связаны ли они с приемом пищи?
 *   **Type:** single
-*   **Options:** Сразу после еды. Через 1–2 часа. Связаны с голодом. Не связаны. По-разному
+*   **Options:** Сразу после еды. В течение 1–2 часов. Связаны с голодом. Не связаны. Бывает по-разному
 
-### 22. `q_gut_heartburn`
-*   **Text:** Беспокоит ли вас изжога?
-*   **Type:** single
-*   **Options:** Да. Часто. Редко. Нет
-
-### 23. `q_gut_bloating`
-*   **Text:** Беспокоит ли вздутие живота?
+### q_gut_heartburn
+*   **Text:** Беспокоят ли вас изжога, жжение за грудиной, отрыжка, нарушение глотания?
 *   **Type:** single
 *   **Options:** Часто. Иногда. Нет
 
-### 24. `q_gut_appetite`
-*   **Text:** Как у вас с аппетитом?
+### q_gut_bloating
+*   **Text:** Беспокоят ли вас вздутие живота или метеоризм?
 *   **Type:** single
-*   **Options:** Стабильно хороший. Все время хочется есть. Плохой. Нестабильный
+*   **Options:** Нет. Иногда. Постоянно
 
-### 25. `q_gut_stool_freq`
-*   **Text:** Как часто бывает стул?
+### q_gut_appetite
+*   **Text:** Оцените ваш аппетит
 *   **Type:** single
-*   **Options:** Ежедневный. Несколько раз в день. Не каждый день. Склонность к запорам
+*   **Options:** Стабильно хороший. Все время хочется есть. Плохой. Нестабильный. изменчивый
 
-### 26. `q_gut_stool_type`
-*   **Text:** Характер стула
+### q_gut_stool_regular
+*   **Text:** Какая регулярность стула?
 *   **Type:** single
-*   **Options:** Оформленный. Кашицеобразный. Жидкий. Твердый ("овечий"). Чередование
+*   **Options:** Ежедневный по утрам. Ежедневный в разное время. Несколько раз в сутки. Непредсказуемый. Не каждый день
 
-### 27. `q_gut_nausea`
-*   **Text:** Бывает ли тошнота?
+### q_gut_stool_type
+*   **Text:** Оцените характер стула
 *   **Type:** single
-*   **Options:** Да. Иногда. При укачивании. Нет
+*   **Options:** Нормальный. оформленный Мягкий. неоформленный Склонность к диарее. Очень плотный. Нестабильный. Есть примеси
 
-### 28. `q_gut_hunger_pain`
-*   **Text:** Бывают ли "голодные" боли?
-*   **Type:** single
-*   **Options:** Да. Нет
-
-### 29. `q_skin_issues`
-*   **Text:** Есть ли проблемы с кожей?
+### q_gut_nausea
+*   **Text:** Испытываете ли вы тошноту?
 *   **Type:** multi
-*   **Options:** Сухость. Акне. Высыпания. Жирность. Зуд. Псориаз. Новообразования. Ничего не беспокоит
-*   If answer != "Ничего не беспокоит" set flag_skin
+*   **Options:** Бывает иногда. На определенные продукты. Очень редко. При укачивании
 
-### 30. `q_skin_doctor`
-*   **Text:** Обращались ли к специалисту?
+### q_gut_hunger_break
+*   **Text:** Как вы переносите длительные перерывы между приемами пищи?
 *   **Type:** single
-*   **Options:** Да. Нет. Наблюдаюсь
+*   **Options:** Нормально. могу забыть о еде Справляюсь Появляется слабость. головокружение. Очень плохо
 
-### 31. `q_dependencies`
-*   **Text:** Есть ли зависимости?
+### q_gut_sleep_after_food
+*   **Text:** Испытываете ли вы сонливость после еды?
+*   **Type:** single
+*   **Options:** Да. Нет. Бывает редко
+
+### q_gut_food_intolerance
+*   **Text:** Есть ли продукты, после которых вы замечаете ухудшение самочувствия?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_appearance_check
+*   **Text:** Устраивает ли вас состояние, внешний вид, качество кожи, волос,ногтей?
+*   **Type:** single
+*   **Options:** ДА. все хорошо Проблемы с кожей. Не устраивает состояние волос/ногтей
+
+### q_skin_issues
+*   **Text:** Что вас не устраивает в состоянии кожи? (можно выбрать несколько вариантов)
 *   **Type:** multi
-*   **Options:** Нет. Пищевые. Курение. Алкоголь. Игры. Гаджеты. Другое
-*   If answer != "Нет" set flag_nervous
+*   **Options:** Сухость. раздражение. Изменение цвета. Высыпания. дерматиты. Акне. Повышенная жирность. Папилломы. родинки. Бородавки. Потеря упругости. Стрии. Зуд. Возрастные изменения. Отечность. Витилиго. Псориаз. Новообразования. Грибок
 
-### 32. `q_stress_level`
-*   **Text:** Оцените уровень стресса от 1 до 10
+### q_skin_doctor
+*   **Text:** Обращались ли вы к специалисту по поводу кожи?
 *   **Type:** single
-*   **Options:** 1. 2. 3. 4. 5. 6. 7. 8. 9. 10
-*   If answer == "7" set flag_nervous
-*   If answer == "8" set flag_nervous
-*   If answer == "9" set flag_nervous
-*   If answer == "10" set flag_nervous
+*   **Options:** Да. Нет. Постоянно наблюдаюсь
 
-### 33. `q_memory_problem`
-*   **Text:** Есть ли проблемы с памятью?
-*   **Type:** single
-*   **Options:** Да. Нет
-*   If answer == "Да" set flag_nervous
-
-### 34. `q_anemia_weakness`
-*   **Text:** Беспокоит ли слабость и быстрая утомляемость?
+### q_nervous_problem_question
+*   **Text:** Есть ли у вас проблемы с нервной системой, памятью или повышенный уровень стресса?
 *   **Type:** single
 *   **Options:** Да. Нет
 
-### 35. `q_anemia_skin`
-*   **Text:** Есть ли бледность кожи или выпадение волос?
-*   **Type:** single
-*   **Options:** Да. Нет
-
-### 36. `q_anemia_taste`
-*   **Text:** Есть ли тяга к мелу, льду?
-*   **Type:** single
-*   **Options:** Да. Нет
-
-### 37. `q_anemia_breath`
-*   **Text:** Есть ли одышка при легкой нагрузке?
-*   **Type:** single
-*   **Options:** Да. Нет
-
-### 38. `q_anemia_smell`
-*   **Text:** Есть ли тяга к запахам (лак, бензин)?
-*   **Type:** single
-*   **Options:** Да. Нет
-
-### 39. `q_anemia_cheilitis`
-*   **Text:** Есть ли заеды в уголках рта?
-*   **Type:** single
-*   **Options:** Да. Нет
-
-### 40. `q_anemia_meat`
-*   **Text:** Есть ли отвращение к мясу?
-*   **Type:** single
-*   **Options:** Да. Нет
-
-### 41. `q_anemia_cold`
-*   **Text:** Есть ли повышенная зябкость рук и ног?
-*   **Type:** single
-*   **Options:** Нет. Иногда. Часто
-
-### 42. `q_nervous_memory`
+### q_nervous_memory
 *   **Text:** Как вы оцениваете свою память?
 *   **Type:** multi
-*   **Options:** Все хорошо. Страдает кратковременная. Плохо удерживаю информацию. Все забываю. Забываю слова
+*   **Options:** Все хорошо. Страдает кратковременная память. Плохо удерживаю информацию. Все забываю. Забываю слова и имена
 
-### 43. `q_nervous_tics`
-*   **Text:** Есть ли тики или непроизвольные движения?
+### q_nervous_tics
+*   **Text:** Наблюдаете ли вы тики или непроизвольные движения?
 *   **Type:** single
 *   **Options:** Да. Иногда. Нет
 
-### 44. `q_nervous_communication`
-*   **Text:** Как вы ощущаете себя в общении?
+### q_nervous_communication
+*   **Text:** Как вы ощущаете себя в общении с людьми?
 *   **Type:** single
-*   **Options:** Легко общаюсь. Устаю. Предпочитаю одиночество. Не могу без общения
+*   **Options:** Легко общаюсь. Устаю от общения. Предпочитаю одиночество. Не могу без общения
 
-### 45. `q_nervous_emotional`
-*   **Text:** Устраивает ли эмоциональное состояние?
+### q_nervous_emotional
+*   **Text:** Устраивает ли вас ваше эмоциональное состояние?
 *   **Type:** single
 *   **Options:** Да. Нет. Наблюдаюсь у специалиста
 
-### 46. `q_nervous_stress_reaction`
-*   **Text:** Как реагируете на стресс?
+### q_nervous_stress_reaction
+*   **Text:** Как вы реагируете на стресс?
 *   **Type:** single
 *   **Options:** Адекватно. Остро. С поддержкой препаратов
 
-### 47. `q_nervous_coping`
-*   **Text:** Есть ли навыки управления стрессом?
+### q_nervous_coping
+*   **Text:** Есть ли у вас навыки управления стрессом?
 *   **Type:** single
 *   **Options:** Да. Нет
 
-### 48. `q_nervous_decisions`
-*   **Text:** Легко ли принимаете решения?
+### q_nervous_decisions
+*   **Text:** Насколько легко вам принимать решения?
 *   **Type:** single
-*   **Options:** Легко. Сложно. Зависит
+*   **Options:** Легко. Сложно. Зависит от ситуации
 
-### 49. `q_nervous_thinking`
-*   **Text:** Устраивает ли умственная работоспособность?
+### q_nervous_thinking
+*   **Text:** Устраивает ли вас уровень мышления и умственной работоспособности?
 *   **Type:** single
-*   **Options:** Устраивает. Не устраивает
+*   **Options:** Устраивает. Не устраивает Ухудшился. но справляюсь
 
-### 50. `q_oda_problem`
-*   **Text:** Беспокоят ли проблемы опорно-двигательного аппарата?
+### q_anemia_weakness
+*   **Text:** Беспокоит ли вас слабость или быстрая утомляемость?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_anemia_skin
+*   **Text:** Замечаете ли вы бледность кожи или выпадение волос?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_anemia_taste
+*   **Text:** Бывают ли необычные вкусовые желания (мел, лед и т.п.)?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_anemia_breath
+*   **Text:** Бывает ли одышка или учащенное сердцебиение при легкой нагрузке?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_anemia_smell
+*   **Text:** Есть ли тяга к необычным запахам (лак, бензин и т.п.)?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_anemia_cheilitis
+*   **Text:** Беспокоят ли заеды в углах рта?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_anemia_meat
+*   **Text:** Есть ли отвращение к мясу или продуктам?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_anemia_cold
+*   **Text:** Отмечаете ли повышенную зябкость рук и ног?
+*   **Type:** single
+*   **Options:** Да. Нет Иногда
+
+### q_oda_problem
+*   **Text:** Беспокоят ли вас проблемы опрно-двигательного аппарата?
 *   **Type:** single
 *   **Options:** Да. Нет. Сейчас нет
 
-### 51. `q_oda_pain`
-*   **Text:** Если да, то где локализуется боль?
+### q_oda_pain
+*   **Text:** Беспокоят ли вас болевые ощущения?
 *   **Type:** multi
-*   **Options:** Шея. Спина. Поясница. Суставы. Мышцы
+*   **Options:** Голова. Шея. Спина. Поясница. Суставы
 
-### 52. `q_women_menarche`
-*   **Text:** Возраст начала менструации?
+### q_oda_pain_level
+*   **Text:** Оцените интенсивность боли по шкале от 1 до 10
 *   **Type:** text
 
-### 53. `q_survey_end`
-*   **Text:** Спасибо за ответы! Опрос завершен.
+### q_oda_stiffness
+*   **Text:** Есть ли скованность или тугоподвижность суставов?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_oda_diagnosis
+*   **Text:** Есть ли диагностированные заболевания ОДА (грыжи, артрит и т.п.)?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_oda_feet
+*   **Text:** Есть ли патологии стопы?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_oda_shoes
+*   **Text:** Изменился ли размер обуви?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_oda_doctor
+*   **Text:** Обращались ли вы к специалисту?
+*   **Type:** multi
+*   **Options:** Да. Нет
+
+### q_women_menarche
+*   **Text:** Укажите, по возможности, возраст начала первой менструации (менархе)
+*   **Type:** text
+
+### q_women_cycle_status
+*   **Text:** Какое у вас текущее состояние менструального цикла?
+*   **Type:** single
+*   **Options:** Регулярный. Нерегулярный. Отсутствует. Менопауза. Беременность. Лактация
+
+### q_women_pregnancy
+*   **Text:** Были ли у вас беременности или роды?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_women_cycle_length
+*   **Text:** Укажите продолжительность цикла от первого дня менструации до последнего дня цикла (в днях)
+*   **Type:** text
+
+### q_women_menses_length
+*   **Text:** Укажите среднюю продолжительность менструации
+*   **Type:** single
+*   **Options:** 1-2 дня. 3-5 дней. более 5 дней
+
+### q_women_pms
+*   **Text:** Беспокоят ли вас симптомы ПМС? (можно выбрать несколько вариантов)
+*   **Type:** multi
+*   **Options:** Раздражительность. Плаксивость. Боль внизу живота. Набухание молочных желез. Головная боль. Слабость. Отсутствует
+
+### q_women_sleep_menses
+*   **Text:** Замечаете ли вы проблемы со сном накануне или во время менструации?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_women_pain_level
+*   **Text:** Оцените болезненность во время менструации по шкале от 1 до 10
+*   **Type:** text
+
+### q_women_flow_type
+*   **Text:** Как вы можете описать менструальные выделения?
+*   **Type:** single
+*   **Options:** Обильные. Умеренные. Скудные
+
+### q_women_gut_menses
+*   **Text:** Бывает ли дискомфорт со стороны ЖКТ во время или накануне менструации?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_women_bleeding_other_days
+*   **Text:** Бывают ли кровянистые выделения в другие дни цикла?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_women_cystitis
+*   **Text:** Бывают ли у вас проявления цистита?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_women_candidiasis
+*   **Text:** Беспокоят ли проявления молочницы или вагинального дисбиоза?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_women_cosmetics_amount
+*   **Text:** Сколько уходовых средств вы используете ежедневно? (для лица, тела, волос)
+*   **Type:** single
+*   **Options:** 3–4 и менее. 5–8. Около 10. Более 10
+
+### q_women_ecology
+*   **Text:** Выбирая косметические средства, вы уделяете внимание безопасности, экологичности состава, упаковки?
+*   **Type:** single
+*   **Options:** Да. Нет. Не в первую очередь
+
+### q_dental_breath
+*   **Text:** Беспокоит ли вас запах изо рта, стоматологические проблемы, заболевания горла?
+*   **Type:** single
+*   **Options:** Да. Нет
+
+### q_dental_ortho
+*   **Text:** Вас беспокоят ортодонтические патологии?
+*   **Type:** single
+*   **Options:** Да. Сейчас в процессе лечения/брекеты. Уже исправили. Нет
+
+### q_sweating
+*   **Text:** Оцените потоотделение
+*   **Type:** single
+*   **Options:** Потею сильно. часто Нормально. адекватно температуре и активности Редко и скудно
+
+### q_libido
+*   **Text:** Оцените уровень вашего либидо
+*   **Type:** single
+*   **Options:** Все отлично Устраивает Снизился Не могу оценить Отсутствует Пропустить
+
+### q_diet_balance
+*   **Text:** Считаете ли вы ваше питание полноценным сбалансированным рационом?
+*   **Type:** multi
+*   **Options:** Да Нет Соблюдаю определенный протокол/тип питания Вегетарианство Считаю КБЖУ Уделяю внимание качеству продуктов
+
+### q_survey_end
+*   **Text:** Спасибо за ответы! На этом базовый опросник завершен.
 *   **Type:** info
 
 
 ## Logic Rules
 
-*   **From `q_gender` (any answer) to `q_occupation`**
-*   **From `q_occupation` (any answer) to `q_sport_activity`**
-*   **From `q_sport_activity` (any answer) to `q_chronic_diseases`**
-*   **From `q_chronic_diseases` (any answer) to `q_family_diseases`**
-*   **From `q_family_diseases` (any answer) to `q_surgeries`**
-*   **From `q_surgeries` (any answer) to `q_medications`**
-*   **From `q_medications` (any answer) to `q_allergy`**
-*   **From `q_allergy` (any answer) to `q_orvi`**
-*   **From `q_orvi` (any answer) to `q_daily_routine`**
-*   **From `q_daily_routine` (any answer) to `q_sleep_quality`**
-*   **From `q_sleep_quality` (any answer) to `q_sleep_hygiene`**
-*   **From `q_sleep_hygiene` (any answer) to `q_muscle_symptoms`**
-*   **From `q_muscle_symptoms` (any answer) to `q_dizziness`**
-*   **From `q_dizziness` (any answer) to `q_pressure`**
-*   **From `q_pressure` (any answer) to `q_edema`**
-*   **From `q_edema` (any answer) to `q_urination`**
-*   **From `q_urination` (any answer) to `q_veins`**
-*   **From `q_veins` (any answer) to `q_water`**
-*   **From `q_water` (any answer) to `q_gut_pain`**
-
-*   **From `q_gut_pain` (answer: Нет) to `q_gut_heartburn`**
-*   **From `q_gut_pain` (any answer) to `q_gut_pain_relation`**
-*   **From `q_gut_pain_relation` (any answer) to `q_gut_heartburn`**
-
-*   **From `q_gut_heartburn` (any answer) to `q_gut_bloating`**
-*   **From `q_gut_bloating` (any answer) to `q_gut_appetite`**
-*   **From `q_gut_appetite` (any answer) to `q_gut_stool_freq`**
-*   **From `q_gut_stool_freq` (any answer) to `q_gut_stool_type`**
-*   **From `q_gut_stool_type` (any answer) to `q_gut_nausea`**
-*   **From `q_gut_nausea` (any answer) to `q_gut_hunger_pain`**
-*   **From `q_gut_hunger_pain` (any answer) to `q_skin_issues`**
-
-*   **From `q_skin_issues` (flag: flag_skin) to `q_skin_doctor`**
-*   **From `q_skin_issues` (any answer) to `q_dependencies`**
-
-*   **From `q_skin_doctor` (any answer) to `q_dependencies`**
-
-*   **From `q_dependencies` (any answer) to `q_stress_level`**
-*   **From `q_stress_level` (any answer) to `q_memory_problem`**
-
-*   **From `q_memory_problem` (flag: flag_anemia) to `q_anemia_weakness`**
-*   **From `q_memory_problem` (flag: flag_nervous) to `q_nervous_memory`**
-*   **From `q_memory_problem` (any answer) to `q_oda_problem`**
-
-*   **From `q_anemia_weakness` (any answer) to `q_anemia_skin`**
-*   **From `q_anemia_skin` (any answer) to `q_anemia_taste`**
-*   **From `q_anemia_taste` (any answer) to `q_anemia_breath`**
-*   **From `q_anemia_breath` (any answer) to `q_anemia_smell`**
-*   **From `q_anemia_smell` (any answer) to `q_anemia_cheilitis`**
-*   **From `q_anemia_cheilitis` (any answer) to `q_anemia_meat`**
-*   **From `q_anemia_meat` (any answer) to `q_anemia_cold`**
-
-*   **From `q_anemia_cold` (flag: flag_nervous) to `q_nervous_memory`**
+*   **From `q_appearance_check` (answer: ДА все хорошо) to `q_oda_problem`**
+*   **From `q_appearance_check` (answer: Не устраивает состояние волос/ногтей) to `q_anemia_weakness`**
+*   **From `q_appearance_check` (any answer) to `q_skin_issues`**
+*   **From `q_skin_issues` (any answer) to `q_skin_doctor`**
+*   **From `q_skin_doctor` (any answer) to `q_nervous_problem_question`**
+*   **From `q_nervous_problem_question` (answer: Нет) to `q_anemia_weakness`**
+*   **From `q_nervous_problem_question` (any answer) to `q_nervous_memory`**
 *   **From `q_anemia_cold` (any answer) to `q_oda_problem`**
-
-*   **From `q_nervous_memory` (any answer) to `q_nervous_tics`**
-*   **From `q_nervous_tics` (any answer) to `q_nervous_communication`**
-*   **From `q_nervous_communication` (any answer) to `q_nervous_emotional`**
-*   **From `q_nervous_emotional` (any answer) to `q_nervous_stress_reaction`**
-*   **From `q_nervous_stress_reaction` (any answer) to `q_nervous_coping`**
-*   **From `q_nervous_coping` (any answer) to `q_nervous_decisions`**
-*   **From `q_nervous_decisions` (any answer) to `q_nervous_thinking`**
-*   **From `q_nervous_thinking` (any answer) to `q_oda_problem`**
-
 *   **From `q_oda_problem` (answer: Да) to `q_oda_pain`**
-*   **From `q_oda_problem` (answer: Женщина) to `q_women_menarche`**
-*   **From `q_oda_problem` (any answer) to `q_survey_end`**
-
-*   **From `q_oda_pain` (answer: Женщина) to `q_women_menarche`**
-*   **From `q_oda_pain` (any answer) to `q_survey_end`**
-
-*   **From `q_women_menarche` (any answer) to `q_survey_end`**
+*   **From `q_oda_problem` (answer: Мужчина) to `q_dental_breath`**
+*   **From `q_oda_problem` (any answer) to `q_women_menarche`**
+*   **From `q_oda_doctor` (answer: Мужчина) to `q_dental_breath`**
+*   **From `q_oda_doctor` (any answer) to `q_women_menarche`**
+*   **From `q_women_ecology` (any answer) to `q_dental_breath`**
